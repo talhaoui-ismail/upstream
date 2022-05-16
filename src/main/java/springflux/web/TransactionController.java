@@ -4,37 +4,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import springflux.dao.TransactionRepo;
 import springflux.entities.Transaction;
-
-import java.util.UUID;
+import springflux.services.TransactionService;
 
 @RestController
 public class TransactionController {
     @Autowired
-    private TransactionRepo transactionRepo;
+    private TransactionService transactionService;
     @GetMapping("/Transactions")
-    public Flux<Transaction> findAll(){
-        return transactionRepo.findAll();
+    public Flux<Transaction> getAllTransactions(){
+        return transactionService.getAllTransactions();
     }
     @GetMapping("/Transactions/{id}")
-    public Mono<Transaction> findTransactionById(@PathVariable String id){
-        return transactionRepo.findById(UUID.fromString(id));
-    }
-
-    @PostMapping("/AddTransaction")
-    public Mono<Transaction> save(@RequestBody Transaction transaction){
-        return transactionRepo.save(transaction);
+    public Mono<Transaction> findTransactionById(@PathVariable("id") String id){
+        return transactionService.findTransactionById(id);
     }
 
     @DeleteMapping("/Transactions/{id}")
-    public Mono<Void> delete(@PathVariable String id){
-        return transactionRepo.deleteById(UUID.fromString(id));
+    public Mono<Void> delete(@PathVariable("id") String id){
+        return transactionService.delete(id);
     }
 
-    @PutMapping("/AddTransaction/{id}")
-    public Mono<Transaction> update(@RequestBody Transaction transaction,@PathVariable String id){
-        transaction.setIdTransaction(UUID.fromString(id));
-        return transactionRepo.save(transaction);
+    @PostMapping("/AddTransaction/")
+    public Mono<Transaction> addTransaction(@RequestBody Transaction transaction){
+        return transactionService.addTransaction(transaction);
+    }
+
+    @PutMapping("/updateTransationStatus/{id}")
+    public void editTransactionStatus(@PathVariable("id") final String id ,@RequestBody Transaction transaction){
+         transactionService.editTransactionStatus(id,transaction);
     }
 }
